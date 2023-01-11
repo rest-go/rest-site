@@ -6,35 +6,6 @@ sidebar_position: 1
 
 **Rest** serves a fully RESTful API from any SQL database, PostgreSQL, MySQL and SQLite are supported, databases that are wire compatible with PostgreSQL or MySQL , e.g. CockroachDB and TiDB should also be supported now, more databases might be added in the future.
 
-## Getting Started
-### Start Rest in Docker
-run server and connect to an existing database
-``` bash
-# connect to postgres
-docker run -p 3000:3000 restgo/rest -db.url "postgres://user:passwd@localhost:5432/db"
-
-# connect to sqlite file with volume
-docker run -p 3000:3000 -v $(pwd):/data restgo/rest -db.url "sqlite:///data/my.db"
-```
-
-### Use API
-Assume there is a `todos` table in the database with `id`, `title` fields:
-
-``` bash
-# Create a todo item
-curl -XPOST "localhost:3000/todos" -d '{"title": "setup api server", "done": false}'
-
-# Read
-curl -XGET "localhost:3000/todos/1"
-
-# Update
-curl -XPUT "localhost:3000/todos/1" -d '{"title": "setup api server", "done": true}'
-
-# Delete
-curl -XDELETE "localhost:3000/todos/1"
-```
-
-check [Installation](./tutorials/installation) page for more ways to install Rest.
 
 ## Motivation
 

@@ -7,4 +7,4 @@ tags: [rest, api, sql, database]
 
 Hi, there
 
-Rest is born today, try it to run a fully RESTful API from any SQL database in 5 minutes. 
+Rest is born today, try it to run a fully RESTful API from any SQL database in 2 minutes. 
