@@ -4,45 +4,64 @@ sidebar_position: 1
 
 # Introduction
 
-**Rest** serves a fully RESTful API from any (PostgreSQL/MySQL/SQLite) database.
-
+**Rest** serves a fully RESTful API from any SQL database, PostgreSQL, MySQL and SQLite are supported, databases that are wire compatible with PostgreSQL or MySQL , e.g. CockroachDB and TiDB should also be supported now, more databases might be added in the future.
 
 ## Getting Started
+### Start Rest in Docker
+run server and connect to an existing database
+``` bash
+# connect to postgres
+docker run -p 3000:3000 restgo/rest -db.url "postgres://user:passwd@localhost:5432/db"
 
-Get started by **creating a new site**.
-
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
-
-### Installation
-
-- [Node.js](https://nodejs.org/en/download/) version 16.14 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
-
-## Generate a new site
-
-Generate a new Docusaurus site using the **classic template**.
-
-The classic template will automatically be added to your project after you run the command:
-
-```bash
-npm init docusaurus@latest my-website classic
+# connect to sqlite file with volume
+docker run -p 3000:3000 -v $(pwd):/data restgo/rest -db.url "sqlite:///data/my.db"
 ```
 
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
+### Use API
+Assume there is a `todos` table in the database with `id`, `title` fields:
 
-The command also installs all necessary dependencies you need to run Docusaurus.
+``` bash
+# Create a todo item
+curl -XPOST "localhost:3000/todos" -d '{"title": "setup api server", "done": false}'
 
-## Start your site
+# Read
+curl -XGET "localhost:3000/todos/1"
 
-Run the development server:
+# Update
+curl -XPUT "localhost:3000/todos/1" -d '{"title": "setup api server", "done": true}'
 
-```bash
-cd my-website
-npm run start
+# Delete
+curl -XDELETE "localhost:3000/todos/1"
 ```
 
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
+check [Installation](./tutorials/installation) page for more ways to install Rest.
 
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
+## Motivation
 
-Open `docs/intro.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
+Rest came out as a side project when implementing a toy database like SQLite, the idea was inspired by an interesting project [PostgREST](https://postgrest.org/en/stable/) which "is a standalone web server that turns your PostgreSQL database directly into a RESTful API". Golang has the `database/sql` package which provides a generic interface around SQL and there a bunch of [drivers](https://github.com/golang/go/wiki/SQLDrivers) available, so the idea of Rest is to implement a similar api server that serves a fully RESTful API from any SQL database.
+
+## Features
+- Various SQL database (PostgreSQL, MySQL, SQLite)
+- Fully RESTful API
+- Row level policies
+- Authentication and Authorization
+- Built in Golang with built-in concurrency and a robust standard library
+  - `net/http` for the api server
+  - `database/sql` for the generic SQL interface
+  - `encoding/json` for json operations
+  - large ecosystem in database and cloud
+
+## Comparison with other tools
+
+### PostgREST
+
+[PostgREST](https://postgrest.org/en/stable/index.html) is a standalone web server that turns your PostgreSQL database directly into a RESTful API. It's the most similar tool with Rest, it binds to PostgreSQL to leverage powerful PG features, e.g. using PostgreSQL roles concept to provide authentication. Rest aims to serve API from any SQL database and the design principle is to support various SQL database features while using standard SQL tables for application logic.
+
+The idea of Rest is inspired by PostgREST, and it's a great alternative if you are using PostgreSQL now.
+
+### Hasura & Directus
+
+[Hasura](https://hasura.io/) and [Directus](https://directus.io/) are very similar, they are both written in Node.js, provide REST and GraphSQL interface from different databases, has sophisticated authorization mechanism and UI for database management. Besides the open source code there are also companies provide cloud environment to help you run the server. While having more functions they are also more complicated to get start to use.
+
+Rest aims to keep the usage as simple as possible to let users start a fully RESTFul API server in a minute. There might be more features come to Rest, but the design principle should always to keep it simple and stupid.
+
