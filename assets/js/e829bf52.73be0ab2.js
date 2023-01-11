@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkrest_docs=self.webpackChunkrest_docs||[]).push([[710],{8644:e=>{e.exports=JSON.parse('{"title":"How-to guides","slug":"/category/how-to-guides","permalink":"/docs/category/how-to-guides","navigation":{"previous":{"title":"Configuration","permalink":"/docs/tutorials/configuration"},"next":{"title":"API","permalink":"/docs/guides/api"}}}')}}]);

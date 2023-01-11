@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://rest-go.com/blog</id>
+    <title>Rest Blog</title>
+    <updated>2023-01-22T00:00:00.000Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://rest-go.com/blog"/>
+    <subtitle>Rest Blog</subtitle>
+    <icon>https://rest-go.com/img/favicon.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[Welcome]]></title>
+        <id>welcome</id>
+        <link href="https://rest-go.com/blog/welcome"/>
+        <updated>2023-01-22T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Hi, there]]></summary>
+        <content type="html"><![CDATA[<p>Hi, there</p><p>Rest is born today, try it to run a fully RESTful API from any SQL database in 2 minutes.</p>]]></content>
+        <author>
+            <name>shellfly</name>
+            <uri>https://github.com/shellfly</uri>
+        </author>
+        <category label="rest" term="rest"/>
+        <category label="api" term="api"/>
+        <category label="sql" term="sql"/>
+        <category label="database" term="database"/>
+    </entry>
+</feed>

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkrest_docs=self.webpackChunkrest_docs||[]).push([[713],{3457:a=>{a.exports=JSON.parse('[{"label":"rest","permalink":"/blog/tags/rest","count":1},{"label":"api","permalink":"/blog/tags/api","count":1},{"label":"sql","permalink":"/blog/tags/sql","count":1},{"label":"database","permalink":"/blog/tags/database","count":1}]')}}]);
