@@ -6,7 +6,7 @@ sidebar_position: 2
 ## Binary
 
 ### Precompiled binaries
-Precompiled binaries for released versions are available in the [Releases page](https://github.com/rest-go/rest/releases), download it to your local machine and run it directly is the fastest way to using Rest.
+Precompiled binaries for released versions are available on the [Releases](https://github.com/rest-go/rest/releases) page](https://github.com/rest-go/rest/releases), download it to your local machine and run it directly is the fastest way to use Rest.
 
 ### Go install
 If you are familiar with Golang, you can use go install
