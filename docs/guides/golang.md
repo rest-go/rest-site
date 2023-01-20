@@ -1,11 +1,11 @@
 ---
-sidebar_position: 4
+sidebar_position: 5
 ---
 
 # Golang library
 
 ## Use Rest as a Go library
-It also works to embed rest server into an existing Go http server
+It also works to embed the Rest server into an existing Go HTTP server
 
 ``` go
 package main

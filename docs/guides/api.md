@@ -8,6 +8,12 @@ sidebar_position: 1
 
 ## Read
 
+:::tip
+
+Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+
+:::
+
 ## Update
 
 ## Delete

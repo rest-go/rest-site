@@ -67,7 +67,7 @@ const config = {
             type: 'doc',
             docId: 'intro',
             position: 'left',
-            label: 'Tutorial',
+            label: 'Docs',
           },
           {to: '/blog', label: 'Blog', position: 'left'},
           {
@@ -92,10 +92,13 @@ const config = {
           {
             title: 'Community',
             items: [
-             
               {
                 label: 'Twitter',
                 href: 'https://twitter.com/restgo_rest',
+              },
+              {
+                label: 'Discord',
+                href: 'https://discord.gg/vawh9RSzQ9',
               },
             ],
           },

@@ -1,10 +1,12 @@
 ---
 sidebar_position: 1
 ---
-# Quick Start
+# Quick start with Docker
 
-## Start Rest in Docker
-run server and connect to an existing database
+## Rest Image
+
+Run the server and connect to an existing database
+
 ``` bash
 # connect to postgres
 docker run -p 3000:3000 restgo/rest -db.url "postgres://user:passwd@localhost:5432/db"
@@ -14,19 +16,25 @@ docker run -p 3000:3000 -v $(pwd):/data restgo/rest -db.url "sqlite:///data/my.d
 ```
 
 ## Use API
-Assume there is a `todos` table in the database with `id`, `title` fields:
+Assume there is a `todos` table in the database with `id`, `title` fields, the RESTFul CURD API is auto-generated for the table.
 
+#### Create a todo item
 ``` bash
-# Create a todo item
 curl -XPOST "localhost:3000/todos" -d '{"title": "setup api server", "done": false}'
+```
 
-# Read
+#### Read
+``` bash
 curl -XGET "localhost:3000/todos/1"
+```
 
-# Update
+#### Update
+``` bash
 curl -XPUT "localhost:3000/todos/1" -d '{"title": "setup api server", "done": true}'
+```
 
-# Delete
+#### Delete
+``` bash
 curl -XDELETE "localhost:3000/todos/1"
 ```
 

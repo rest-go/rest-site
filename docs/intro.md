@@ -14,7 +14,6 @@ Rest came out as a side project when implementing a toy database like SQLite, th
 ## Features
 - Various SQL databases (PostgreSQL, MySQL, SQLite)
 - Fully RESTful API
-- Row level policies
 - Authentication and Authorization
 - Written in Golang with built-in concurrency and a robust standard library
   - `net/http` for the API server
@@ -30,9 +29,9 @@ Rest came out as a side project when implementing a toy database like SQLite, th
 
 The idea of Rest is inspired by PostgREST, and it's a great alternative if you are using PostgreSQL now.
 
-### Hasura & Directus
+### Headless CMS
 
-[Hasura](https://hasura.io/) and [Directus](https://directus.io/) are very similar, they are both written in Node.js, provide REST and GraphSQL interfaces from different databases, has sophisticated authorization mechanisms and UI for database management. Besides the open-source code, they also have companies that provide a cloud environment to help you run the server. While having more functions they are also more complicated to get started using.
+There are also projects called headless CMS like [Hasura](https://hasura.io/) and [Directus](https://directus.io/). They are very similar, both are written in Node.js, provide REST and GraphSQL interfaces from different databases, has sophisticated authorization mechanisms and UI for database management. Besides the open-source code, they also have companies that provide a cloud environment to help you run the server. While having more functions they are also more complicated to get started using.
 
 Rest aims to keep the usage as simple as possible to let users start a fully RESTFul API server in a minute. There might be more features coming to Rest, but the design principle should always keep it simple and stupid.
 
