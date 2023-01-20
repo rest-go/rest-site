@@ -1,6 +1,6 @@
 ---
-slug: hello
-title: Hello World
+slug: welcome
+title: 你好，世界
 authors: [shellfly]
 tags: [rest, api, sql, database]
 ---

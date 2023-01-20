@@ -24,7 +24,7 @@ const config = {
   // to replace "en" with "zh-Hans".
   i18n: {
     defaultLocale: 'en',
-    locales: ['en'],
+    locales: ['en', "zh-Hans"],
   },
 
   presets: [
@@ -71,10 +71,14 @@ const config = {
           },
           {to: '/blog', label: 'Blog', position: 'left'},
           {
+            type: 'localeDropdown',
+            position: 'right',
+          },
+          {
             href: 'https://github.com/rest-go/rest',
             label: 'GitHub',
             position: 'right',
-          },
+          }
         ],
       },
       footer: {
@@ -84,8 +88,8 @@ const config = {
             title: 'Docs',
             items: [
               {
-                label: 'Tutorial',
-                to: '/docs/intro',
+                label: 'Getting started',
+                to: '/docs/getting-started/docker',
               },
             ],
           },
@@ -116,7 +120,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Rest, Inc. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Rest. Built with Docusaurus.`,
       },
       prism: {
         theme: lightCodeTheme,
