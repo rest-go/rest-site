@@ -4,7 +4,6 @@ sidebar_position: 3
 
 # Configuration
 
-## Intro
 At the minimum, Rest requires a database URL to connect to be able to serve requests. Rest uses a unified format to connect to various databases. See the [Database config](#database-config) section below for the detailed format.
 
 Config parameters are read in the following order:
@@ -46,7 +45,7 @@ output help message
 
 ## Config File
 
-Rest can read a config file, there is no predefined location for this file, you must specify the file path manually.
+Rest can read a config file, there is no predefined location for this file, if you want to use a config file, you have to specify the file path manually.
 
 ``` bash
 $ rest -config config.yml
@@ -76,7 +75,7 @@ auth:
 
 Specify the database URL to connect to, the URL consists of the driver name and the actual DSN. Supported databases are listed below:
 
-|  Database | Format |
+|  Database | URL Format |
 |---|---|
 | PostgreSQL | postgres://user:passwd@localhost:5432/db_name?search_path=schema_name |
 | MySQL      | mysql://user:passwd@tcp(127.0.0.1:3306)/db_name |
@@ -84,7 +83,7 @@ Specify the database URL to connect to, the URL consists of the driver name and 
 
 ## Auth config
 
-By default, all the endpoints are public without any authentication, if you want to have user management and authentication for the API endpoints, you can turn on auth configs. Check the [Authentication and Authorization](../guides/auth) guide to understand how it works.
+By default, all the endpoints are public without any authentication. It's suitable to be used as an internal tool or put after a reverse proxy like Nginx. if you want to have user authentication for the API endpoints, you can turn on auth configs. Check the [Authentication and Authorization](../guides/auth) guide to understand how it works.
 
 `enabled`
 

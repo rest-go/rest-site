@@ -2,19 +2,18 @@
 sidebar_position: 3
 ---
 
-# Configuration
+# 配置
 
-## Intro
-At the minimum, Rest requires a database URL to connect to be able to serve requests. Rest uses a unified format to connect to various databases. See the [Database config](#database-config) section below for the detailed format.
+Rest中的配置只有数据库的连接是必须的，只有连接到了数据库才能处理请求。Rest使用了统一的格式来连接数据库，支持的格式可以参见下面的 [数据库配置](#数据库配置) 一节。
 
-Config parameters are read in the following order:
-1. From the config file.
-2. From command-line flags, overriding values from the config file.
+配置参数会以以下顺序读取：
+1. 从指定的配置文件中读取
+2. 从命令行参数中读取, 覆盖配置文件中的相同的参数
 
 
-## Flags
+## 命令行参数
 
-Common settings can be set by command-line flags directly
+常见的参数可以直接在命令行中指定
 
 ``` bash
 rest -addr :3000 -db.url sqlite://chinook.db
@@ -22,37 +21,36 @@ rest -addr :3000 -db.url sqlite://chinook.db
 
 `-addr <ip:port>`
 
-specify listen address
+指定服务器的监听地址
 
 ---
 
 `-db.url <dsn>`
 
-specify database URL
+指定数据库的连接地址
 
 ---
 
 
 `-config <path>`
 
-specify the config file path
+指定配置文件路径
 
 ---
 
 `-help`
 
-output help message
+输出帮助信息
 
+## 配置文件
 
-## Config File
-
-Rest can read a config file, there is no predefined location for this file, you must specify the file path manually.
+Rest 可以读取一个配置文件，没有默认的配置文件的路径，如果要用配置文件，需要手动指定文件路径。
 
 ``` bash
 $ rest -config config.yml
 ```
 
-#### config.yml sample
+#### config.yml 示例
 
 ```yml
 # server listen addr
@@ -70,26 +68,26 @@ auth:
 
 
 
-## Database Config
+## 数据库配置
 
 `url`
 
-Specify the database URL to connect to, the URL consists of the driver name and the actual DSN. Supported databases are listed below:
+指定要连接的数据库地址，由支持的数据库驱动名和实际地址组成，下面是当前支持的数据库和对应的格式示例
 
-|  Database | Format |
+|  数据库 | 地址格式 |
 |---|---|
 | PostgreSQL | postgres://user:passwd@localhost:5432/db_name?search_path=schema_name |
 | MySQL      | mysql://user:passwd@tcp(127.0.0.1:3306)/db_name |
 | SQLite     | sqlite:///path/to/my.db |
 
-## Auth config
+## 用户验证配置
 
-By default, all the endpoints are public without any authentication, if you want to have user management and authentication for the API endpoints, you can turn on auth configs. Check the [Authentication and Authorization](../guides/auth) guide to understand how it works.
+默认情况下，所有的Rest接口都是可以直接访问，不需要任何验证信息的，比较适合作为一个内部服务，或者放在其他方向代理比如Nginx的后面。如果你想要验证用户，可以打开用户验证配置。查看 [验证和授权](../guides/auth) 页面了解它是怎么工作的。
 
 `enabled`
 
-Whether to enable authentication and authorization, default false.
+是否要求验证，默认是否
 
 `secret`
 
-The JWT secret. It is used to sign and parse the JWT token.
+JWT 密钥，用来签名和解析JWT token

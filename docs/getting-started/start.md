@@ -1,9 +1,9 @@
 ---
 sidebar_position: 1
 ---
-# Quick start with Docker
+# Quick start
 
-## Rest image
+## Docker image
 
 Run the server in Docker and connect to an existing database
 

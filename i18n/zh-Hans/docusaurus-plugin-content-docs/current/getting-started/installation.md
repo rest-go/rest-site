@@ -1,20 +1,22 @@
 ---
 sidebar_position: 2
 ---
-# Installation
+# 安装
 
-## Binary
+## 二进制文件
 
-### Precompiled binaries
-Precompiled binaries for released versions are available on the [Releases page](https://github.com/rest-go/rest/releases), download it to your local machine, and running it directly is the fastest way to use Rest.
+### 预编译的二进制文件
+版本的 [发布页面](https://github.com/rest-go/rest/releases) 提供了预先编译好的不同平台的二进制文件，可以直接下载运行。
 
 ### Go install
-If you are familiar with Golang, you can use go install
+
+如果你对Go语言比较熟，也可以使用 `go install` 命令进行安装
+
 ``` bash
 go install github.com/rest-go/rest
 ```
 
-### Run server
+### 运行
 
 ``` bash
 rest -db.url "mysql://username:password@tcp(localhost:3306)/db"

@@ -1,11 +1,11 @@
 ---
 sidebar_position: 1
 ---
-# Quick start with Docker
+# 快速开始
 
-## Rest image
+## Docker镜像
 
-Run the server in Docker and connect to an existing database
+在Docker中启动Rest server，连接到一个现有的数据库。
 
 ``` bash
 # connect to postgres
@@ -15,31 +15,32 @@ docker run -p 3000:3000 restgo/rest -db.url "postgres://user:passwd@localhost:54
 docker run -p 3000:3000 -v $(pwd):/data restgo/rest -db.url "sqlite:///data/my.db"
 ```
 
-## Use API
-Assume there is a `todos` table in the database with `id`, `title` fields, the RESTFul CURD API is auto-generated for the table.
+## 使用 API
 
-#### Create a todo item
+假设已经有一个 `todos` 表在数据库中，表中有 `id` 和 `title` 字段，那么现在已经自动生成了CRUD的API可以直接使用。
+
+#### 创建一个todo项
 ``` bash
 curl -XPOST "localhost:3000/todos" -d '{"title": "setup api server", "done": false}'
 ```
 
-#### Read
+#### 读取
 ``` bash
 curl -XGET "localhost:3000/todos/1"
 ```
 
-#### Update
+#### 更新
 ``` bash
 curl -XPUT "localhost:3000/todos/1" -d '{"title": "setup api server", "done": true}'
 ```
 
-#### Delete
+#### 删除
 ``` bash
 curl -XDELETE "localhost:3000/todos/1"
 ```
 
 
-## What's Next
-- Check the [Installation](./installation) page for more ways to install Rest.
-- Check the [Configuration](./configuration) page for how to configure Rest.
-- Check the [API guide](../guides/api) page for different API operations.
+## 接下来
+- 在 [安装](./installation) 页面可以找到不同的安装方法
+- 在 [配置](./configuration) 页面了解怎么配置Rest server
+- 在 [API手册](../guides/api) 中了解更多种的API使用方式
