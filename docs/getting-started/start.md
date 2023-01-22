@@ -11,6 +11,9 @@ Run the server in Docker and connect to an existing database
 # connect to postgres
 docker run -p 3000:3000 restgo/rest -db.url "postgres://user:passwd@localhost:5432/db"
 
+# connect to mysql
+docker run -p 3000:3000 restgo/rest -db.url "mysql://user:passwd@tcp(127.0.0.1:3306)/db_name"
+
 # connect to sqlite file with volume
 docker run -p 3000:3000 -v $(pwd):/data restgo/rest -db.url "sqlite:///data/my.db"
 ```
