@@ -1,0 +1,225 @@
+---
+sidebar_position: 1
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+# API
+
+## Example table
+
+To demonstrate all the API usage, we will use the below table definition as an example. All tables in the database are exposed in one-level deep routes. For instance, the full contents of a table `products` are returned at `/products`, and it returns
+an empty list when the table has no records.
+<Tabs>
+  <TabItem value="pg" label="PG" default>
+
+  ``` sql
+  CREATE TABLE products (
+      id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+      name VARCHAR(128) NOT NULL,
+      description TEXT NOT NULL,
+      level INTEGER NOT NULL,
+      price DECIMAL(10,2) NOT NULL,
+      hidden BOOL NOT NULL DEFAULT false,
+      json_data JSON
+  )
+  ```
+  </TabItem>
+  <TabItem value="my" label="MySQL">
+
+  ``` sql
+  CREATE TABLE products (
+      id INTEGER PRIMARY KEY AUTO_INCREMENT,
+      name VARCHAR(128) NOT NULL,
+      description TEXT NOT NULL,
+      level INTEGER NOT NULL,
+      price DECIMAL(10,2) NOT NULL,
+      hidden BOOL NOT NULL DEFAULT false,
+      json_data JSON
+  )
+  ```
+  </TabItem>
+  <TabItem value="sqlite" label="SQLite">
+
+  ``` sql
+  CREATE TABLE products (
+      id INTEGER PRIMARY KEY,
+      name VARCHAR(128) NOT NULL,
+      description TEXT NOT NULL,
+      level INTEGER NOT NULL,
+      price DECIMAL(10,2) NOT NULL,
+      hidden BOOL NOT NULL DEFAULT false,
+      json_data JSON
+  )
+  ```
+  </TabItem>
+</Tabs>
+
+
+
+
+```bash
+curl "localhost:3000/products"
+
+[]
+```
+
+## Filtering
+
+You can filter result rows by adding conditions on columns through query args. For instance, to return products which under level 2:
+
+```bash
+curl "localhost:3000/products?level=lt.2"
+```
+
+Multiple conditions could be used. For instance, to return products which under level2 and is not hidden:
+
+```bash
+curl "localhost:3000/products?level=lt.2&hidden=is.false"
+```
+
+## Operators
+
+These operators are available:
+
+|  Abbreviation | In SQL | Meaning |
+|---|---|---|
+| eq     | =    | equal, e.g. `?id=eq.1`|
+| ne     | <\>  | not equal, , e.g. `?id=ne.1` |
+| gt     | >    | greater than |
+| gte    | >=   | greater than or equal |
+| lt     | <    | less than |
+| lte    | <=   | less than or equal |
+| like   | LIKE | LIKE operator (use \* instead of % to avoid URL encoding), e.g. `?name=like.a*` |
+| ilike  | ILIKE| ILIKE operator (use \* instead of % to avoid URL encoding), e.g. `?name=ilike.a*`|
+| in     | IN   | one of a list of values, e.g. `?id=in.(1,2,3)` |
+| is     | IS   | checking for exact equality  (null,true,false), e.g. `?hidden=is.true` |
+
+
+## Singular or Plural
+
+By default, all JSON results are returned in an array, even when there is only one item. To return the first result as an object unenclosed by an array
+use `singular` query parameter. 
+
+:::caution
+
+Using `singular` will check whether there is exactly one row matched in database, it'll return an error if multiple rows matched.
+
+::: 
+
+```bash
+curl "localhost:3000/products?id=eq.1&singular"
+```
+
+## Primary key
+
+If there is a primary key defined on the table (which is a good practice), the primary key can be used in the url directly.
+
+:::tip
+
+Use primary key in url is a syntax sugar of the format `?id=eq.1&singular`, the primary key is dynamically get from table so it could be a name other than **id**, but only
+**single column** primary key is supported, composite columns are not supported.
+
+:::
+
+```bash
+curl "localhost:3000/products/1"
+```
+
+
+## Select columns
+
+The client can specify which columns to return using the `select` parameter.
+
+```bash
+curl "localhost:3000/products?select=name,description"
+```
+
+## JSON columns
+
+When query JSON column, arrow operators(`->` or `->>`) can be used to specify a path for the column. There are different syntax for JSON path in different
+databases, Rest use as the same syntax as per the [PostgreSQL docs](https://www.postgresql.org/docs/current/functions-json.html), and auto transform the syntax to different drivers 
+to avoid bad URL characters.
+
+### Select JSON columns
+
+```
+curl "localhost:3000/products?select=name,json_data->a,json_data->c->1"
+```
+
+### Query JSON columns
+```
+curl "localhost:3000/products?select=name&json_data->>c->1=eq.2"
+```
+
+## Resource embedding
+
+**[Not supported yet, WIP]** Automatiically fetch related records for one-to-one, one-to-many relations.
+
+## Count
+
+Use `count` in the query parameters to return rows count of the table.
+
+```bash
+curl "localhost:3000/products?count"
+```
+
+## Order
+
+Use `order` in query parameters for SQL order by.
+
+```bash
+curl "localhost:3000/products?order=id.desc,name.asc"
+```
+
+## Page
+
+Use `page` and `page_size` to control paged results. The default page is **1**, and default page size is **100**. You can
+change them based on the requirement.
+
+```bash
+curl "localhost:3000/products?page=2&page_size=1"
+```
+
+The page operation is implemented using `OFFSET` and `LIMIT` in SQL, it could be slow when trying to fetch big page number, it's a good practice
+to use explicit order by and fetch next page based on  the maxinum value of current page.
+
+```bash
+curl "localhost:3000/products?order=id&id=gt.100"
+```
+
+## Insert
+
+To insert a row in a database table, post a JSON object whose keys are the names of the columns you would like to insert. Missing properties will be set to default values when applicable.
+
+```bash
+curl -XPOST "localhost:3000/products" -d '{"name":"n3", "description":"d3", "level":2, "price":10.24, "json_data":"{}"}'
+
+curl -XPOST "localhost:3000/products" -d '{"name":"n4", "description":"d4", "level":3, "price":20.48, "json_data":"{\"a\":\"b\", \"b\":1, \"c\":[1,2,3], \"d\":{\"a\":\"b\"}}"}'
+```
+
+### Bulk insert
+
+You can also provide a JSON array of objects having **uniform** keys to do bulk insertion.
+
+```bash
+curl -XPOST "localhost:3000/products" -d '[{"name":"n5", "description":"d5", "level":1, "price":1}, {"name":"n6", "description":"d5", "level":1, "price":1}]'
+```
+
+## Update
+
+Update an object by passing part of the columns you want to modify using HTTP `PUT` method.
+
+```
+curl -XPUT "localhost:3000/products/1" -d '{"name":"n6"}'
+```
+
+## Delete
+
+Delete matched objects using HTTP `DELETE` method.
+
+```
+curl -XDELETE "localhost:3000/products/1"
+```

@@ -1,0 +1,223 @@
+---
+sidebar_position: 1
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+# API
+
+## 示例表
+
+为了演示所有API用法，我们将使用下表定义作为示例。数据库中的所有表都暴露在一级路由中。例如， `/products` 会返回表 `products` 的全部内容，在表为空时，返回一个空数组。
+
+<Tabs>
+  <TabItem value="pg" label="PG" default>
+
+  ``` sql
+  CREATE TABLE products (
+      id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+      name VARCHAR(128) NOT NULL,
+      description TEXT NOT NULL,
+      level INTEGER NOT NULL,
+      price DECIMAL(10,2) NOT NULL,
+      hidden BOOL NOT NULL DEFAULT false,
+      json_data JSON
+  )
+  ```
+  </TabItem>
+  <TabItem value="my" label="MySQL">
+
+  ``` sql
+  CREATE TABLE products (
+      id INTEGER PRIMARY KEY AUTO_INCREMENT,
+      name VARCHAR(128) NOT NULL,
+      description TEXT NOT NULL,
+      level INTEGER NOT NULL,
+      price DECIMAL(10,2) NOT NULL,
+      hidden BOOL NOT NULL DEFAULT false,
+      json_data JSON
+  )
+  ```
+  </TabItem>
+  <TabItem value="sqlite" label="SQLite">
+
+  ``` sql
+  CREATE TABLE products (
+      id INTEGER PRIMARY KEY,
+      name VARCHAR(128) NOT NULL,
+      description TEXT NOT NULL,
+      level INTEGER NOT NULL,
+      price DECIMAL(10,2) NOT NULL,
+      hidden BOOL NOT NULL DEFAULT false,
+      json_data JSON
+  )
+  ```
+  </TabItem>
+</Tabs>
+
+
+
+
+```bash
+curl "localhost:3000/products"
+
+[]
+```
+
+## 过滤
+
+可以通过添加列名到HTTP的查询字符串中来过滤匹配的数据，例如, 要返回所有level小于2的products:
+
+```bash
+curl "localhost:3000/products?level=lt.2"
+```
+
+多个条件可以一起使用. 例如, 要返回所有level小于2并且hidden时false的products:
+
+```bash
+curl "localhost:3000/products?level=lt.2&hidden=is.false"
+```
+
+## 操作符
+
+支持的操作符有：
+
+|  缩写 | SQL | 含义 |
+|---|---|---|
+| eq     | =    | 相等, 例如 `?id=eq.1`|
+| ne     | <\>  | 不相等, , 例如 `?id=ne.1` |
+| gt     | >    | 大于 |
+| gte    | >=   | 大于等于 |
+| lt     | <    | 小于 |
+| lte    | <=   | 小于等于 |
+| like   | LIKE | LIKE 操作符 (使用 \* 来代替 %，比如URL转义问题), 例如 `?name=like.a*` |
+| ilike  | ILIKE| ILIKE 操作符 (使用 \* 来代替 %，比如URL转义问题), 例如 `?name=ilike.a*`|
+| in     | IN   | 在列表中, 例如 `?id=in.(1,2,3)` |
+| is     | IS   | 检查null,true,false, 例如 `?hidden=is.true` |
+
+
+## 单数和复数
+
+默认情况下，所有JSON结果都在一个数组中返回，即使只有一个元素也是如此。如果要想将第一个结果作为未包含在数组中的对象返回，可以使用
+ `singular` 查询参数。
+
+:::caution
+
+使用 `singular` 会检查数据库中是否只有一行匹配，如果多行匹配则返回错误。
+
+::: 
+
+```bash
+curl "localhost:3000/products?id=eq.1&singular"
+```
+
+## 主键
+
+如果表上定义了主键（通常是一个好的实践），则可以直接在URL中使用主键。
+:::tip
+
+在URL中使用主键的值可以看作是格式`?id=eq.1&singular`的语法糖，主键是动态从表中获取的，所以它可以是**id**以外的名称，但只能
+**单列** 的主键，不支持复合的列。
+
+:::
+
+```bash
+curl "localhost:3000/products/1"
+```
+
+
+## 指定返回列
+
+客户端可以使用 `select` 参数指定要返回的列。
+
+```bash
+curl "localhost:3000/products?select=name,description"
+```
+
+## JSON 列
+
+查询JSON列时，可以使用箭头运算符（`->` 或 `->>`）来指定路径。不同的数据库有不同的语法，Rest使用与[PostgreSQL 文档](https://www.postgresql.org/docs/current/functions-json.html)相同的语法，并自动将语法转换为不同的驱动程序
+以避免非法的URL字符。
+
+### 选择JSON列
+
+```
+curl "localhost:3000/products?select=name,json_data->a,json_data->c->1"
+```
+
+### 查询JSON列
+```
+curl "localhost:3000/products?select=name&json_data->>c->1=eq.2"
+```
+
+## 资源内嵌
+
+**[尚不支持，WIP]** 自动获取一对一、一对多关系的相关记录。
+
+## 行数
+
+在查询参数中使用 `count` 返回表的行数。
+
+```bash
+curl "localhost:3000/products?count"
+```
+
+## 排序
+
+在查询参数中使用 `order` 来指定SQL order by。
+
+```bash
+curl "localhost:3000/products?order=id.desc,name.asc"
+```
+
+## 分页
+
+使用 `page` 和 `page_size` 来控制分页结果。默认page为 **1**，默认page_size为 **100**。可以
+根据需求更改它们。
+
+```bash
+curl "localhost:3000/products?page=2&page_size=1"
+```
+
+分页操作是使用SQL中的 `OFFSET` 和 `LIMIT` 实现的，在尝试获取很大页码时可能会很慢，一般推荐
+使用显式排序，并根据当前页面的最大值获取下一页结果。
+
+```bash
+curl "localhost:3000/products?order=id&id=gt.100"
+```
+
+## 插入
+
+要在数据库表中插入一行，使用HTTP POST方法传递一个JSON对象，其键是要插入的列的名称。缺少的属性将在适用时设置为默认值。
+
+```bash
+curl -XPOST "localhost:3000/products" -d '{"name":"n3", "description":"d3", "level":2, "price":10.24, "json_data":"{}"}'
+
+curl -XPOST "localhost:3000/products" -d '{"name":"n4", "description":"d4", "level":3, "price":20.48, "json_data":"{\"a\":\"b\", \"b\":1, \"c\":[1,2,3], \"d\":{\"a\":\"b\"}}"}'
+```
+
+### 批量插入
+
+可以提供一个包含**相同键**的JSON数组来批量插入数据。
+
+```bash
+curl -XPOST "localhost:3000/products" -d '[{"name":"n5", "description":"d5", "level":1, "price":1}, {"name":"n6", "description":"d5", "level":1, "price":1}]'
+```
+
+## 更新
+
+通过使用 HTTP `PUT` 方法传递要修改的部分列来更新对象。
+
+```
+curl -XPUT "localhost:3000/products/1" -d '{"name":"n6"}'
+```
+
+## 删除
+
+使用 HTTP `DELETE` 方法删除匹配的对象。
+
+```
+curl -XDELETE "localhost:3000/products/1"
+```

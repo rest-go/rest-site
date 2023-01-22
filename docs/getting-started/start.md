@@ -16,7 +16,7 @@ docker run -p 3000:3000 -v $(pwd):/data restgo/rest -db.url "sqlite:///data/my.d
 ```
 
 ## Use API
-Assume there is a `todos` table in the database with `id`, `title` fields, the RESTFul CURD API is auto-generated for the table.
+Assume there is a `todos` table in the database with `id`, `title` and `done` fields, the RESTFul CURD API is auto-generated for the table.
 
 #### Create a todo item
 ``` bash
@@ -42,4 +42,4 @@ curl -XDELETE "localhost:3000/todos/1"
 ## What's Next
 - Check the [Installation](./installation) page for more ways to install Rest.
 - Check the [Configuration](./configuration) page for how to configure Rest.
-- Check the [API guide](../guides/api) page for different API operations.
+- Check the [API guide](../guides/api) page for detail API usage.

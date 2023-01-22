@@ -9,7 +9,7 @@ const FeatureList = [
     description: (
       <>
         Rest was designed from the ground up to be easily installed and
-        used to get your api server up and running quickly.
+        used to get your API server up and running quickly.
       </>
     ),
   },
@@ -19,7 +19,7 @@ const FeatureList = [
     description: (
       <>
         Rest lets you focus on your data, and we&apos;ll do the chores. Go
-        ahead to point Rest to your database and get a fully RESTFuly api server
+        ahead to point Rest to your database and get a fully RESTFul API server
         instantly
       </>
     ),
@@ -30,7 +30,7 @@ const FeatureList = [
     description: (
       <>
         Rest is built in Golang with built-in concurrency and a robust standard library, 
-        there is a large ecosystem in database and cloud to empower Rest.
+        there is a large ecosystem in database and cloud-native.
       </>
     ),
   },

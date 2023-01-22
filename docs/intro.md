@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # Introduction
 
-**Rest** serves a fully RESTful API from any SQL database, PostgreSQL, MySQL, and SQLite are supported, and databases that are wire compatible with PostgreSQL or MySQL, e.g. CockroachDB and TiDB should also be supported now, more databases might be added in the future.
+**Rest** serves a fully RESTful API from any SQL database, PostgreSQL, MySQL, and SQLite are supported now, and databases that are wire compatible with PostgreSQL or MySQL, e.g. CockroachDB and TiDB should also work, more databases might be added in the future.
 
 
 ## Motivation
@@ -19,7 +19,7 @@ Rest came out as a side project when implementing a toy database like SQLite, th
   - `net/http` for the API server
   - `database/sql` for the generic SQL interface
   - `encoding/json` for json operations
-  - a large ecosystem in database and cloud
+  - a large ecosystem in database and cloud-native
 
 ## Comparison with other tools
 

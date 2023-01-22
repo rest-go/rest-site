@@ -1,0 +1,175 @@
+---
+sidebar_position: 2
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# 验证和授权
+
+身份验证和授权是基于独立的Golang库[rest-go/auth](https://github.com/rest-go/auth)。
+
+它使用JWT token来识别当前用户，并使用PostgreSQL [Row Security Policies](https://www.postgresql.org/docs/current/ddl-rowsecurity.html) 类似的想法来控制用户权限，不过这些策略都保存在一个普通的数据库表，这样我们就不需要混合数据库角色和应用程序用户，也可以支持不同的数据库。
+
+用于管理身份验证和授权的两个数据库表 `auth_users` 和 `auth_policies` 会在安装过程中自动创建。
+
+## 配置
+
+设置身份验证需要数据库URL和JWT密钥。可以查看[Configuration](/docs/getting-started/configuration)页面了解如何配置它们。
+
+## 初始化
+
+首次运行服务器后，发送一个POST请求到 `/auth/setup` 来初始化数据库表并创建一个管理员帐户，用户名和密码将包含在返回中。
+
+```bash
+curl -XPOST localhost:3000/auth/setup
+```
+
+### 命令行
+
+有一些有用的命令可以帮助管理授权用户和策略。
+
+```bash
+# setup database tables (same effect as POST /auth/setup)
+rest -db.url <url> auth setup
+
+# list users
+rest -db.url <url> auth user list
+# add an user
+rest -db.url <url> auth user add <username> <password> <is_admin>
+
+# list policies
+rest -db.url <url> auth policy list
+# add a policy
+rest -db.url <url> auth policy add <table_name> <action> <exression> <description>
+```
+
+## 验证
+
+:::info
+
+如果在使用其他系统进行用户管理（令牌生成），可以跳过这一部分， 可以直接到[授权](/docs/guides/auth#authorization) 部分查看如何为用户进行授权。
+
+:::
+
+认证部分用于用户注册、登录和注销。这些操作基于在数据库表 `auth_users`。表的定义大概是这样：
+
+```sql
+CREATE TABLE auth_users (
+  id INTEGER PRIMARY KEY,
+  username VARCHAR(32) UNIQUE NOT NULL,
+  password VARCHAR(72) NOT NULL,
+  is_admin bool NOT NULL DEFAULT false
+)
+```
+
+身份验证处理程序提供了三个内置接口：**register**、**login**和**logout**。
+
+### Register
+
+通过用户名和密码注册一个新的用户帐户。
+
+``` bash
+curl -XPOST localhost:3000/auth/register -d '{"username": "hello", "password":"world"}'
+```
+
+### Login
+
+使用用户名和密码登录，JWT 令牌将在响应中返回。
+
+```bash
+curl -i -XPOST localhost:3000/auth/login -d '{"username": "hello", "password":"world"}
+```
+
+然后就可以在其他请求中使用令牌来识别用户。
+
+```bash
+curl "localhost:3000/products" -H "Authorization: Bearer <TOKEN>"
+```
+
+
+### Logout
+
+目前身份验证机制仅基于 JWT 令牌，注销在服务器端没有什么实际的操作，客户端需要自行清除令牌。
+
+```bash
+$ curl  -XPOST "localhost:3000/auth/logout"
+```
+
+
+## 授权
+
+授权部分是控制一个用户可以访问哪些表或行，策略维护在数据库表 `auth_policies`中，表的定义大概是：
+
+```sql
+CREATE TABLE auth_policies (
+	id INTEGER PRIMARY KEY,
+	description VARCHAR(256) NOT NULL,
+	table_name VARCHAR(128) NOT NULL,
+	action VARCHAR(16) NOT NULL,
+	expression VARCHAR(128) NOT NULL
+)
+```
+
+
+  
+### JWT令牌
+
+当前验证用户由在HTTP `Authorization` 头中传递的JWT令牌标识，该令牌可以从上面 **Authentication** 部分中提到的 **login** 端点获取，也可以是一个来自其他系统的有效令牌。
+
+:::tip
+
+在使用其他系统的JWT令牌是，要确保使用相同的JWT密码，并在JWT的令牌中中包含一个`user_id`字段。
+
+:::
+
+```bash
+curl "localhost:3000/products" -H "Authorization: Bearer <TOKEN>"
+```
+
+### 默认策略
+
+一些默认策略是在安装过程中创建的。未启用身份验证时，默认情况下所有端点都可公开访问。启用身份验证后，所有端点都由默认策略控制。
+
+| table_name | action | expression | description |
+|---|---|---|---|
+| auth_users    | all | auth_user.is_admin | users operations are limited to admin user |
+| auth_policies | all | auth_user.is_admin | policies operations are limited to admin user |
+| all           | all | user_id = auth_user.id | all tables/actions are limited to be filtered by user_id |
+
+### Action & Expression
+
+`action` 可以是以下这些值：
+
+- **create** (create a record using HTTP POST)
+- **read**   (read record(s) using HTTP GET)
+- **update** (update a record using HTTP PUT)
+- **delete** (delete a record using HTTP DELETE)
+- **read_mine**   (read record(s) using HTTP GET and with a `?mine` query parameter)
+- **all**   (all actions above)
+
+`expression`中的**auth_user**是一个关键字，用来表示当前验证的用户。
+
+### 示例策略
+
+以下请求需要来自管理员用户的令牌，也可以通过[命令行](/docs/guides/auth#command-line) 添加策略。
+
+1. 把一个表设为可以公开访问
+
+```bash
+curl -XPOST "localhost:3000/auth_policies" -d '{"table_name": "artists", "action": "all", "expression":"", "description":"make artists public"}'
+```
+
+2. 把一个表设为可以公开访问，但是当使用 `?mine` 查询时，过滤当前用户的记录
+
+```bash
+curl -XPOST "localhost:3000/auth_policies" -d '{"table_name": "artists", "action": "all", "expression":"", "description":"make artists public, but limit read_mine"}'
+
+curl -XPOST "localhost:3000/auth_policies" -d '{"table_name": "artists", "action": "read_mine", "expression":"user_id=auth_user.id", "description":"make artists public, but limit read_mine"}'
+```
+
+3. 使用自定义的**author_id**字段来过滤user_id
+
+```bash
+curl -XPOST "localhost:3000/auth_policies" -d '{"table_name": "artists", "action": "all", "expression":"author_id=auth_user.id","description":"use author_id column"}'
+```

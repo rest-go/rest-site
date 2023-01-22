@@ -1,0 +1,175 @@
+---
+sidebar_position: 2
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Authentication & Authorization
+
+The authentication & authorization is based on a standalone Golang library [rest-go/auth](https://github.com/rest-go/auth). 
+
+It uses JWT token to identify current user and uses the idea of PostgreSQL [Row Security Policies](https://www.postgresql.org/docs/current/ddl-rowsecurity.html) to control users permission, the policies are implemented in a normal database table so that we don't need to mix database role with appliation user, and it can works for different databases. 
+
+The two database tables `auth_users` and `auth_policies` which used to manage authentication and authorization will be created automatically during setup.
+
+## Configuration
+
+A database URL and a JWT secret is required to setup auth, check the [Configuration](/docs/getting-started/configuration) page to see how to config them.
+
+## Setup
+
+After getting the server running for the first time, send a post to the `/auth/setup` endpoint to setup databasse tables and create an admin account, the username and password will be included in the returned response.
+
+```bash
+curl -XPOST localhost:3000/auth/setup
+```
+
+### Command line
+
+There are a few useful commands to help manage auth users and policies.
+
+```bash
+# setup database tables (same effect as POST /auth/setup)
+rest -db.url <url> auth setup
+
+# list users
+rest -db.url <url> auth user list
+# add an user
+rest -db.url <url> auth user add <username> <password> <is_admin>
+
+# list policies
+rest -db.url <url> auth policy list
+# add a policy
+rest -db.url <url> auth policy add <table_name> <action> <exression> <description>
+```
+
+## Authentication
+
+:::info
+
+If you're using other system for users management (tokens generation), you can skip this part, and go to the [Authorization](/docs/guides/auth#authorization) part to see how to do authorization for auth users.
+
+:::
+
+The authentication part is for user registration, login and logout. The operations is based on a database table `auth_users` which is created during setup. The schema is like :
+```sql
+CREATE TABLE auth_users (
+  id INTEGER PRIMARY KEY,
+  username VARCHAR(32) UNIQUE NOT NULL,
+  password VARCHAR(72) NOT NULL,
+  is_admin bool NOT NULL DEFAULT false
+)
+```
+
+There are three built-in endpoints provided by the auth handler: **register**, **login**, and **logout**.
+
+### Register
+
+Register a new user account by username and password.
+
+``` bash
+curl -XPOST localhost:3000/auth/register -d '{"username": "hello", "password":"world"}'
+```
+
+### Login
+
+Login with username and password, a JWT token will be returned in the response.
+
+```bash
+curl -i -XPOST localhost:3000/auth/login -d '{"username": "hello", "password":"world"}
+```
+
+The token then can be used in other requests to identify user. 
+
+```bash
+curl "localhost:3000/products" -H "Authorization: Bearer <TOKEN>"
+```
+
+
+### Logout
+
+Currently, the authentication mechanism is based on JWT token only, logout is a no-op on the
+server side, the client need clear the token by itself.
+
+```bash
+$ curl  -XPOST "localhost:3000/auth/logout"
+```
+
+
+## Authorization
+
+The authorization part is to control which tables or rows one user can access, the policies are maintained in a database table `auth_policies` which is created during setup. The schema is like :
+
+```sql
+CREATE TABLE auth_policies (
+	id INTEGER PRIMARY KEY,
+	description VARCHAR(256) NOT NULL,
+	table_name VARCHAR(128) NOT NULL,
+	action VARCHAR(16) NOT NULL,
+	expression VARCHAR(128) NOT NULL
+)
+```
+
+
+  
+### JWT token
+
+The current auth user is identified by a JWT token passed in the HTTP `Authorization` header, the token can either be obtained from the **login** endpoint mentioned in the **Authentication** section above, or is a valid JWT token from other system.
+
+:::tip
+
+Make sure to use the same JWT secret, and include a `user_id` field  in the JWT claims when using a token from other system.
+
+:::
+
+```bash
+curl "localhost:3000/products" -H "Authorization: Bearer <TOKEN>"
+```
+
+### Default policies
+
+A few of default polices are created during setup. When auth is not enabled, all the endpoints are publicly accessible by default. After auth is enabled, all the endpoints are controled by the default polices.
+
+| table_name | action | expression | description |
+|---|---|---|---|
+| auth_users    | all | auth_user.is_admin | users operations are limited to admin user |
+| auth_policies | all | auth_user.is_admin | policies operations are limited to admin user |
+| all           | all | user_id = auth_user.id | all tables/actions are limited to be filtered by user_id |
+
+### Action & Expression
+
+The value for the `action` column could be one of below values：
+
+- **create** (create a record using HTTP POST)
+- **read**   (read record(s) using HTTP GET)
+- **update** (update a record using HTTP PUT)
+- **delete** (delete a record using HTTP DELETE)
+- **read_mine**   (read record(s) using HTTP GET and with a `?mine` query parameter)
+- **all**   (all actions above)
+
+The **auth_user** in the `expression` value is a key word to represent current user of the request.
+
+### Example policies
+
+Below requests require a token from a admin user, you can also add policy through [command line](/docs/guides/auth#command-line).
+
+1. Make a table public
+
+```bash
+curl -XPOST "localhost:3000/auth_policies" -d '{"table_name": "artists", "action": "all", "expression":"", "description":"make artists public"}'
+```
+
+2. Make a table public, but limited to current user when query with `?mine`
+
+```bash
+curl -XPOST "localhost:3000/auth_policies" -d '{"table_name": "artists", "action": "all", "expression":"", "description":"make artists public, but limit read_mine"}'
+
+curl -XPOST "localhost:3000/auth_policies" -d '{"table_name": "artists", "action": "read_mine", "expression":"user_id=auth_user.id", "description":"make artists public, but limit read_mine"}'
+```
+
+3. Use the column **author_id** on the table to filter user id.
+
+```bash
+curl -XPOST "localhost:3000/auth_policies" -d '{"table_name": "artists", "action": "all", "expression":"author_id=auth_user.id","description":"use author_id column"}'
+```

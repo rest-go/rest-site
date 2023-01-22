@@ -83,7 +83,7 @@ Specify the database URL to connect to, the URL consists of the driver name and 
 
 ## Auth config
 
-By default, all the endpoints are public without any authentication. It's suitable to be used as an internal tool or put after a reverse proxy like Nginx. if you want to have user authentication for the API endpoints, you can turn on auth configs. Check the [Authentication and Authorization](../guides/auth) guide to understand how it works.
+By default, all the endpoints are public without any authentication. It's suitable to be used as an internal tool or put after a reverse proxy like Nginx. If you want to have user authentication for the API endpoints, you can turn on auth configs. Check the [Authentication and Authorization](../guides/auth) guide for the follow-up setup steps and understand how it works.
 
 `enabled`
 
@@ -91,4 +91,4 @@ Whether to enable authentication and authorization, default false.
 
 `secret`
 
-The JWT secret. It is used to sign and parse the JWT token.
+The JWT secret that used to sign and parse the JWT token.
