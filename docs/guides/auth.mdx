@@ -7,7 +7,7 @@ import TabItem from '@theme/TabItem';
 
 # Authentication & Authorization
 
-The authentication & authorization is based on a standalone Golang library [rest-go/auth](https://github.com/rest-go/auth). 
+The authentication & authorization is based on the [`auth`](https://github.com/rest-go/rest/tree/main/pkg/auth) package.
 
 It uses JWT token to identify current user and uses the idea of PostgreSQL [Row Security Policies](https://www.postgresql.org/docs/current/ddl-rowsecurity.html) to control users permission, the policies are implemented in a normal database table so that we don't need to mix database role with appliation user, and it can works for different databases. 
 
