@@ -137,6 +137,10 @@ A few of default polices are created during setup. When auth is not enabled, all
 | auth_policies | all | auth_user.is_admin | policies operations are limited to admin user |
 | all           | all | user_id = auth_user.id | all tables/actions are limited to be filtered by user_id |
 
+:::tip
+
+The expression `user_id = auth_user.id` indicates that a field named `user_id` is required in the table.
+
 ### Action & Expression
 
 The value for the `action` column could be one of below values：
@@ -168,7 +172,13 @@ curl -XPOST "localhost:3000/auth_policies" -d '{"table_name": "artists", "action
 curl -XPOST "localhost:3000/auth_policies" -d '{"table_name": "artists", "action": "read_mine", "expression":"user_id=auth_user.id", "description":"make artists public, but limit read_mine"}'
 ```
 
-3. Use the column **author_id** on the table to filter user id.
+3. Restrict table access to users who have logged in.
+
+```bash
+curl -XPOST "localhost:3000/auth_policies" -d '{"table_name": "artists", "action": "all", "expression":"auth_user.is_authenticated", "description":"restrict table access to users who have logged in"}'
+```
+
+4. Use the column **author_id** on the table to filter user id.
 
 ```bash
 curl -XPOST "localhost:3000/auth_policies" -d '{"table_name": "artists", "action": "all", "expression":"author_id=auth_user.id","description":"use author_id column"}'
