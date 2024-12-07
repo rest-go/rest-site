@@ -9,9 +9,9 @@
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
         <item>
-            <title><![CDATA[Welcome]]></title>
-            <link>https://rest-go.com/blog/welcome</link>
-            <guid>welcome</guid>
+            <title><![CDATA[Hello World]]></title>
+            <link>https://rest-go.com/blog/hello</link>
+            <guid>hello</guid>
             <pubDate>Sun, 22 Jan 2023 00:00:00 GMT</pubDate>
             <description><![CDATA[Hi, there]]></description>
             <content:encoded><![CDATA[<p>Hi, there</p><p>Rest is born today, try it to run a fully RESTful API from any SQL database in 2 minutes.</p>]]></content:encoded>

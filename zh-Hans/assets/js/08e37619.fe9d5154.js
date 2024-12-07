@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkrest_docs=self.webpackChunkrest_docs||[]).push([[174],{6009:s=>{s.exports=JSON.parse('{"permalink":"/zh-Hans/blog/tags/database","page":1,"postsPerPage":10,"totalPages":1,"totalCount":1,"blogDescription":"Blog","blogTitle":"Blog"}')}}]);

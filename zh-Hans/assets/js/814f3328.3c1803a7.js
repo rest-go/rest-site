@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkrest_docs=self.webpackChunkrest_docs||[]).push([[535],{5641:e=>{e.exports=JSON.parse('{"title":"\u6700\u8fd1\u6587\u7ae0","items":[{"title":"\u4f60\u597d\uff0c\u4e16\u754c","permalink":"/zh-Hans/blog/welcome"}]}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkrest_docs=self.webpackChunkrest_docs||[]).push([[535],{5641:e=>{e.exports=JSON.parse('{"title":"Recent posts","items":[{"title":"Hello World","permalink":"/blog/hello"}]}')}}]);

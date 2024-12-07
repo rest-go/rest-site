@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkrest_docs=self.webpackChunkrest_docs||[]).push([[322],{4876:t=>{t.exports=JSON.parse('{"title":"Tutorials","slug":"/category/tutorials","permalink":"/docs/category/tutorials","navigation":{"previous":{"title":"Introduction","permalink":"/docs/intro"},"next":{"title":"Quick Start","permalink":"/docs/tutorials/start"}}}')}}]);
