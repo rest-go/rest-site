@@ -137,6 +137,10 @@ curl "localhost:3000/products" -H "Authorization: Bearer <TOKEN>"
 | auth_policies | all | auth_user.is_admin | policies operations are limited to admin user |
 | all           | all | user_id = auth_user.id | all tables/actions are limited to be filtered by user_id |
 
+:::tip
+
+`user_id = auth_user.id` 意味着表中需要存在一个名为 `user_id` 的字段。
+`
 ### Action & Expression
 
 `action` 可以是以下这些值：
@@ -168,7 +172,13 @@ curl -XPOST "localhost:3000/auth_policies" -d '{"table_name": "artists", "action
 curl -XPOST "localhost:3000/auth_policies" -d '{"table_name": "artists", "action": "read_mine", "expression":"user_id=auth_user.id", "description":"make artists public, but limit read_mine"}'
 ```
 
-3. 使用自定义的**author_id**字段来过滤user_id
+3. 只有登录后的用户可以访问该表
+
+```bash
+curl -XPOST "localhost:3000/auth_policies" -d '{"table_name": "artists", "action": "all", "expression":"auth_user.is_authenticated", "description":"restrict table access to users who have logged in"}'
+```
+
+4. 使用自定义的**author_id**字段来过滤user_id
 
 ```bash
 curl -XPOST "localhost:3000/auth_policies" -d '{"table_name": "artists", "action": "all", "expression":"author_id=auth_user.id","description":"use author_id column"}'
